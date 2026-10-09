@@ -1,5 +1,7 @@
 package com.interviewforge.backend.service.impl;
 
+import com.interviewforge.backend.exception.ConflictException;
+import com.interviewforge.backend.exception.ResourceNotFoundException;
 import com.interviewforge.backend.dtos.question.AnswerResponse;
 import com.interviewforge.backend.dtos.question.AnswerSubmitRequest;
 import com.interviewforge.backend.dtos.question.QuestionResponse;
@@ -34,7 +36,7 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     public QuestionResponse generateNextQuestion(Long sessionId) {
         InterviewSession session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new IllegalStateException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
 
         int nextSequence = questionRepository.findBySessionIdOrderBySequenceNoAsc(sessionId).size() + 1;
 
@@ -58,10 +60,10 @@ public class QuestionServiceImpl implements QuestionService {
     @Transactional
     public AnswerResponse submitAnswer(AnswerSubmitRequest request) {
         Question question = questionRepository.findById(request.questionId())
-                .orElseThrow(() -> new IllegalStateException("Question not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Question not found"));
 
         if (answerRepository.findByQuestionId(question.getId()).isPresent()) {
-            throw new IllegalStateException("This question has already been answered");
+            throw new ConflictException("This question has already been answered");
         }
 
         Answer answer = Answer.builder()

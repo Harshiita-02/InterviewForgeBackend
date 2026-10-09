@@ -1,5 +1,6 @@
 package com.interviewforge.backend.service.impl;
 
+import com.interviewforge.backend.exception.ResourceNotFoundException;
 import com.interviewforge.backend.dtos.session.SessionCreateRequest;
 import com.interviewforge.backend.dtos.session.SessionResponse;
 import com.interviewforge.backend.entity.*;
@@ -31,12 +32,12 @@ public class InterviewSessionServiceImpl implements InterviewSessionService {
     @Transactional
     public SessionResponse create(SessionCreateRequest request) {
         User user = userRepository.findById(request.userId())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         CompanyTemplate template = null;
         if (request.companyTemplateId() != null) {
             template = companyTemplateRepository.findById(request.companyTemplateId())
-                    .orElseThrow(() -> new IllegalStateException("Company template not found"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Company template not found"));
         }
 
         Set<Topic> topics = new HashSet<>(topicRepository.findAllById(request.topicIds()));
@@ -58,7 +59,7 @@ public class InterviewSessionServiceImpl implements InterviewSessionService {
     @Transactional(readOnly = true)
     public SessionResponse getById(Long id) {
         InterviewSession session = sessionRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
         return sessionMapper.toResponse(session);
     }
 
@@ -74,7 +75,7 @@ public class InterviewSessionServiceImpl implements InterviewSessionService {
     @Transactional
     public SessionResponse endSession(Long id) {
         InterviewSession session = sessionRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
 
         session.setStatus(SessionStatus.COMPLETED);
         session.setEndedAt(LocalDateTime.now());

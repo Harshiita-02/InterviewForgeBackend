@@ -1,5 +1,6 @@
 package com.interviewforge.backend.controller;
 
+import com.interviewforge.backend.exception.ResourceNotFoundException;
 import com.interviewforge.backend.dtos.auth.LoginRequest;
 import com.interviewforge.backend.dtos.auth.LoginResponse;
 import com.interviewforge.backend.dtos.user.UserResponse;
@@ -37,7 +38,7 @@ public class AuthController {
         );
 
         User user = userRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String token = jwtService.generateToken(new UserPrincipal(user));
 

@@ -1,5 +1,7 @@
 package com.interviewforge.backend.service.impl;
 
+import com.interviewforge.backend.exception.ConflictException;
+import com.interviewforge.backend.exception.ResourceNotFoundException;
 import com.interviewforge.backend.dtos.template.CompanyTemplateCreateRequest;
 import com.interviewforge.backend.dtos.template.CompanyTemplateResponse;
 import com.interviewforge.backend.dtos.template.CompanyTemplateSummary;
@@ -30,7 +32,7 @@ public class CompanyTemplateServiceImpl implements CompanyTemplateService {
     @Transactional
     public CompanyTemplateResponse create(CompanyTemplateCreateRequest request) {
         if (templateRepository.findByCompanyName(request.companyName()).isPresent()) {
-            throw new IllegalStateException("Template for this company already exists");
+            throw new ConflictException("Template for this company already exists");
         }
 
         Set<Topic> topics = new HashSet<>(topicRepository.findAllById(request.topicIds()));
@@ -49,7 +51,7 @@ public class CompanyTemplateServiceImpl implements CompanyTemplateService {
     @Transactional(readOnly = true)
     public CompanyTemplateResponse getById(Long id) {
         CompanyTemplate template = templateRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("Company template not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Company template not found"));
         return templateMapper.toResponse(template);
     }
 

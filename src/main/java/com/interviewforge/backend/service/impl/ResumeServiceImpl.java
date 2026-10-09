@@ -1,5 +1,6 @@
 package com.interviewforge.backend.service.impl;
 
+import com.interviewforge.backend.exception.ResourceNotFoundException;
 import com.interviewforge.backend.dtos.resume.ResumeResponse;
 import com.interviewforge.backend.entity.Resume;
 import com.interviewforge.backend.entity.User;
@@ -33,7 +34,7 @@ public class ResumeServiceImpl implements ResumeService {
     @Transactional
     public ResumeResponse upload(Long userId, MultipartFile file) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         String storedPath = storeFile(file);
 

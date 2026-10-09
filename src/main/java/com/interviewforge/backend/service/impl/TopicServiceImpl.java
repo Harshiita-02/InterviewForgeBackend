@@ -1,5 +1,6 @@
 package com.interviewforge.backend.service.impl;
 
+import com.interviewforge.backend.exception.ConflictException;
 import com.interviewforge.backend.dtos.topic.TopicCreateRequest;
 import com.interviewforge.backend.dtos.topic.TopicResponse;
 import com.interviewforge.backend.entity.Topic;
@@ -24,7 +25,7 @@ public class TopicServiceImpl implements TopicService {
     @Transactional
     public TopicResponse createCustomTopic(TopicCreateRequest request) {
         if (topicRepository.existsByName(request.name())) {
-            throw new IllegalStateException("Topic already exists");
+            throw new ConflictException("Topic already exists");
         }
 
         Topic topic = Topic.builder()

@@ -1,5 +1,7 @@
 package com.interviewforge.backend.service.impl;
 
+import com.interviewforge.backend.exception.ConflictException;
+import com.interviewforge.backend.exception.ResourceNotFoundException;
 import com.interviewforge.backend.dtos.user.UserResponse;
 import com.interviewforge.backend.dtos.user.UserSignupRequest;
 import com.interviewforge.backend.entity.User;
@@ -21,7 +23,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse signup(UserSignupRequest request) {
         if (userRepository.existsByEmail(request.email())) {
-            throw new IllegalStateException("Email already registered");
+            throw new ConflictException("Email already registered");
         }
 
         User user = User.builder()
@@ -37,7 +39,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse getById(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new IllegalStateException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         return userMapper.toResponse(user);
     }
 }

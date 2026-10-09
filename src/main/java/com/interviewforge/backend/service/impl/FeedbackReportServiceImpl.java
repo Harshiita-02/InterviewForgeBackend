@@ -1,5 +1,7 @@
 package com.interviewforge.backend.service.impl;
 
+import com.interviewforge.backend.exception.ConflictException;
+import com.interviewforge.backend.exception.ResourceNotFoundException;
 import com.interviewforge.backend.dtos.feedbackReport.FeedbackReportResponse;
 import com.interviewforge.backend.entity.Answer;
 import com.interviewforge.backend.entity.FeedbackReport;
@@ -34,10 +36,10 @@ public class FeedbackReportServiceImpl implements FeedbackReportService {
     @Transactional
     public FeedbackReportResponse generateReport(Long sessionId) {
         InterviewSession session = sessionRepository.findById(sessionId)
-                .orElseThrow(() -> new IllegalStateException("Session not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Session not found"));
 
         if (reportRepository.findBySessionId(sessionId).isPresent()) {
-            throw new IllegalStateException("Report already generated for this session");
+            throw new ConflictException("Report already generated for this session");
         }
 
         List<Question> questions = questionRepository.findBySessionIdOrderBySequenceNoAsc(sessionId);
@@ -81,7 +83,7 @@ public class FeedbackReportServiceImpl implements FeedbackReportService {
     @Transactional(readOnly = true)
     public FeedbackReportResponse getBySessionId(Long sessionId) {
         FeedbackReport report = reportRepository.findBySessionId(sessionId)
-                .orElseThrow(() -> new IllegalStateException("Report not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Report not found"));
         return reportMapper.toResponse(report);
     }
 }
